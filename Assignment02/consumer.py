@@ -1,11 +1,20 @@
 import time
 import logging
+import click
+
+
+@click.command()
+@click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
+@click.option('--wb', help='ID Of Bucket to Store Widgets In')
+@click.option('-v', is_flag=True, help='Verbose Mode')
 
 class Consumer():
     def __init__(self, puller, pusher):
         self.__puller = puller
         self.__pusher = pusher
         self.__logger = logging.Logger
+
+        logging.basicConfig(filename='consumerlog.txt', filemode='w', format='[%(levelname)s] %(message)s')
 
     def consume(self, timeout=30):
         waitTime = 0
@@ -33,4 +42,7 @@ class Consumer():
 
         else:
             self.__logger.warning('Malformed Request')
+
+
+if __name__ == "__main__":
 
