@@ -8,7 +8,6 @@ from createrequest import CreateRequest
 from updaterequest import UpdateRequest
 from deleterequest import DeleteRequest
 from errorrequest import ErrorRequest
-from
 from s3puller import S3Puller
 from s3pusher import S3Pusher
 
@@ -21,9 +20,8 @@ class Consumer:
 
     def consume(self, timeout=30):
         waitTime = 0
-        self.__logger.info('Starting Consumer Process')
+        self.__logger.info('Fetching Requests...')
         while waitTime < timeout:
-            self.__logger.info('Fetching Next Request...')
             nextItem = self.__puller.getNext()
             if nextItem:
 
@@ -56,9 +54,9 @@ class Consumer:
 
     def __processCreate(self, widgetRequest):
         self.__logger.info('Request Type: Creation')
-        widget = WidgetFactory.createWidgetFromRequest(widgetRequest)
+        widget = WidgetFactory.widgetFromRequest(widgetRequest)
         self.__logger.info('Widget Created Successfully')
-        self.__pusher.push(widget)
+        self.__pusher.create(widget)
 
     def __processUpdate(self, widgetRequest):
         self.__logger.info('Request Type: Update')
@@ -73,7 +71,7 @@ class Consumer:
 @click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
 @click.option('--wb', help='ID Of Bucket to Store Widgets In')
 @click.option('--path', default='consumerlog.txt', help='Path to LogFile')
-@click.option('-v', isflag=True, help='Verbose Mode')
+@click.option('-v', is_flag=True, help='Verbose Mode')
 def main(rb, wb, path, v):
     # The Actual Nonsense You Have to Go Through for Python Logging
     loggerName = 'consumer'
@@ -90,6 +88,7 @@ def main(rb, wb, path, v):
 
     logger.addHandler(cHandler)
     logger.addHandler(fHandler)
+    logger.setLevel(logging.INFO)
 
     pullBucket = boto3.resource('s3').Bucket(rb)
     pushBucket = boto3.resource('s3').Bucket(wb)

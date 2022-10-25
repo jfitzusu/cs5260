@@ -24,18 +24,19 @@ class WidgetRequestFactory:
         label = request.get('label')
         description = request.get('description')
 
-        if requestType == "WidgetCreateRequest" or requestType == "WidgetUpdateRequest" and (not label or not description):
+
+        if (requestType == "create" or requestType == "update") and (not label or not description):
             return ErrorRequest("Malformed Request. Create and Update Requests Must have a Label and Description")
 
         attributes = request.get('otherAttributes')
 
-        if requestType == "WidgetCreateRequest":
+        if requestType == "create":
             return CreateRequest(requestId, widgetId, owner, label, description, attributes)
 
-        elif requestType == "WidgetUpdateRequest":
+        elif requestType == "update":
             return UpdateRequest(requestId, widgetId, owner, label, description, attributes)
 
-        elif requestType == "WidgetDeleteRequest":
+        elif requestType == "delete":
             return DeleteRequest(requestId, widgetId, owner)
 
         else:

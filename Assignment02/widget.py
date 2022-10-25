@@ -44,7 +44,7 @@ class Widget:
     def toJson(self):
         itemDict = {
             "owner": self.__owner,
-            "Id": self.__id,
+            "id": self.__id,
             "label": self.__label,
             "description": self.__description,
         }
