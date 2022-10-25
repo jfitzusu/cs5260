@@ -1,13 +1,16 @@
+import logging
+
+
 class Pusher:
-    def __init__(self, client, location):
-        self.__client = client
-        self.__location = location
+    def __init__(self, resource, loggerName):
+        self.__resource = resource
+        self.__logger = logging.getLogger(loggerName)
 
-    def create(self, object):
+    def create(self, item):
         pass
 
-    def update(self, object):
+    def update(self, item):
         pass
 
-    def delete(self, object):
+    def delete(self, item):
         pass

@@ -1,6 +1,16 @@
 import time
 import logging
 import click
+import boto3
+from widgetfactory import WidgetFactory
+from widgetrequestfactory import WidgetRequestFactory
+from createrequest import CreateRequest
+from updaterequest import UpdateRequest
+from deleterequest import DeleteRequest
+from errorrequest import ErrorRequest
+from
+from s3puller import S3Puller
+from s3pusher import S3Pusher
 
 
 class Consumer:
@@ -29,17 +39,20 @@ class Consumer:
         widgetRequest = WidgetRequestFactory.fromRawJSON(item)
         self.__logger.info(f'Request Found for Widget [{widgetRequest.getWidgetId()}]. Processing Request...')
 
-        if widgetRequest.type == "WidgetCreateRequest":
+        if type(widgetRequest) == CreateRequest:
             self.__processCreate(widgetRequest)
 
-        elif widgetRequest.type == "WidgetUpdateRequest":
+        elif type(widgetRequest) == UpdateRequest:
             self.__processUpdate(widgetRequest)
 
-        elif widgetRequest.type == "WidgetDeleteRequest":
+        elif type(widgetRequest) == DeleteRequest:
             self.__processDelete(widgetRequest)
 
+        elif type(widgetRequest) == ErrorRequest:
+            self.__logger.warning(widgetRequest.getMessage())
+
         else:
-            self.__logger.info('Malformed Request')
+            self.__logger.error("Unable to Process Request")
 
     def __processCreate(self, widgetRequest):
         self.__logger.info('Request Type: Creation')
@@ -78,7 +91,12 @@ def main(rb, wb, path, v):
     logger.addHandler(cHandler)
     logger.addHandler(fHandler)
 
-    consumer = Consumer()
+    pullBucket = boto3.resource('s3').Bucket(rb)
+    pushBucket = boto3.resource('s3').Bucket(wb)
+
+    puller = S3Puller(pullBucket, loggerName)
+    pusher = S3Pusher(pushBucket, loggerName)
+    consumer = Consumer(puller, pusher, loggerName)
     consumer.consume()
 
 

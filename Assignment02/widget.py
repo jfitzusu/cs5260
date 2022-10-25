@@ -1,8 +1,10 @@
+import json
+
 class Widget:
-    def __init__(self, id, owner, label, description, attributes=None):
+    def __init__(self, widgetId, owner, label, description, attributes=None):
         if attributes is None:
             attributes = []
-        self.__id = id
+        self.__id = widgetId
         self.__owner = owner
         self.__label = label
         self.__description = description
@@ -36,5 +38,18 @@ class Widget:
         assert type(newDescription) == str
         self.__description = newDescription
 
+    def getAttributes(self):
+        return self.__attributes
 
+    def toJson(self):
+        itemDict = {
+            "owner": self.__owner,
+            "Id": self.__id,
+            "label": self.__label,
+            "description": self.__description,
+        }
 
+        if self.__attributes:
+            itemDict['otherAttributes'] = self.__attributes
+
+        return json.dumps(itemDict)
