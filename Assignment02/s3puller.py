@@ -1,23 +1,29 @@
 from puller import Puller
-
+import boto3
+import logging
 
 class S3Puller(Puller):
-    def __init__(self, client, source, logger):
+    def __init__(self, client, source, loggerName):
         self.__client = client
         self.__source = source
-        self.__logger = logger
-        self.__bucket = client.Bucket(source)
+        self.__logger = logging.getLogger(loggerName)
+        self.__bucket = boto3.resource('s3').Bucket(source)
 
     def getNext(self):
 
         for itemSummary in self.__bucket.objects.all():
             try:
-                item = self.__client(itemSummary.bucket_name, itemSummary.key)
+                self.__logger.info(f'Attempting to Read Object: {itemSummary.key}...')
+                item = self.__bucket.Object(itemSummary.key)
                 content = item.get()['Body']
-                return content.read()
+                read = content.read()
+                self.__logger.info('Deleting Object...')
+                item.delete()
+                self.__logger.info('Object Deleted...')
+                return read
 
-                break
-            except Exception:
-                pass
+            except self.__client.exceptions.NoSuchKey:
+                self.__logger.info('Failed To Read: Attempting Next Object')
+                continue
 
         return None

@@ -3,7 +3,6 @@ import logging
 import click
 
 
-
 class Consumer:
     def __init__(self, puller, pusher, loggerName):
         self.__puller = puller
@@ -45,6 +44,7 @@ class Consumer:
     def __processCreate(self, widgetRequest):
         self.__logger.info('Request Type: Creation')
         widget = WidgetFactory.createWidgetFromRequest(widgetRequest)
+        self.__logger.info('Widget Created Successfully')
         self.__pusher.push(widget)
 
     def __processUpdate(self, widgetRequest):
@@ -54,6 +54,7 @@ class Consumer:
     def __processDelete(self, widgetRequest):
         self.__logger.info(f'Request Type: Delete')
         pass
+
 
 @click.command()
 @click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
@@ -80,5 +81,6 @@ def main(rb, wb, path, v):
     consumer = Consumer()
     consumer.consume()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
+    main()
