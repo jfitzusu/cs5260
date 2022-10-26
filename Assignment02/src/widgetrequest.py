@@ -1,11 +1,9 @@
 class WidgetRequest:
-    def __init__(self, requestId, widgetId, owner, label=None, description=None, attributes=None):
+    def __init__(self, requestId, widgetId, owner):
         self.__requestId = requestId
         self.__widgetId = widgetId
         self.__owner = owner
-        self.__label = label
-        self.__description = description
-        self.__attributes = attributes
+
 
     def getRequestId(self):
         return self.__requestId

@@ -42,6 +42,10 @@ class Widget:
     def getAttributes(self):
         return self.__attributes
 
+    def setAttributes(self, newAttributes):
+        assert type(newAttributes) == list
+        self.__attributes = newAttributes
+
     def toJson(self):
         itemDict = {
             "owner": self.__owner,

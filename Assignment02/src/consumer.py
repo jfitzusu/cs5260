@@ -61,18 +61,18 @@ class Consumer:
         self.__pusher.create(widget)
 
     def __processUpdate(self, widgetRequest):
-        self.__logger.info('Request Type: Update')
+        # self.__logger.info('Request Type: Update')
         pass
 
     def __processDelete(self, widgetRequest):
-        self.__logger.info(f'Request Type: Delete')
+        # self.__logger.info(f'Request Type: Delete')
         pass
 
 
 @click.command()
 @click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
-@click.option('--wb', default=None, help='ID Of Bucket to Store Widgets In')
-@click.option('--wt', default=None, help='ID of Table to Store Widgets In (DynamoDB)')
+@click.option('--wb', default=None, help='ID Of Bucket to Store Widgets In (Max 1 Storage Location Specifiable)')
+@click.option('--wt', default=None, help='ID of Table to Store Widgets In (DynamoDB) (Max 1 Storage Location Specifiable)')
 @click.option('--path', default='consumerlog.txt', help='Path to LogFile')
 @click.option('-v', is_flag=True, help='Verbose Mode')
 def main(rb, wb, wt, path, v):
