@@ -10,7 +10,7 @@ class S3Pusher(Pusher):
         self.__logger = logging.getLogger(loggerName)
 
     def create(self, widget):
-            self.__logger.info(f"Attempting to Upload Widget to widgets/{widget.getOwner()}/{widget.getId()}...")
+            self.__logger.info(f"Attempting to Upload Widget to widgets/{widget.getOwner().replace(' ', '-').lower()}/{widget.getId()}...")
             self.__resource.put_object(Body=bytes(widget.toJson(), 'utf-8'), Key=f"widgets/{widget.getOwner()}/{widget.getId()}")
             self.__logger.info("Upload Success")
         # except Exception:
