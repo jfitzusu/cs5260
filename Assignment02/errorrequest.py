@@ -1,8 +1,8 @@
 from widgetrequest import WidgetRequest
 
 class ErrorRequest(WidgetRequest):
-    def __init__(self, error):
-        super().__init__(None, None, None)
+    def __init__(self, error, widgetId=None):
+        super().__init__(widgetId, None, None)
         self.__errorMessage = error
 
     def getMessage(self):

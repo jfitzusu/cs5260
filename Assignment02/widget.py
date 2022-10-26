@@ -1,5 +1,6 @@
 import json
 
+
 class Widget:
     def __init__(self, widgetId, owner, label, description, attributes=None):
         if attributes is None:
@@ -53,3 +54,16 @@ class Widget:
             itemDict['otherAttributes'] = self.__attributes
 
         return json.dumps(itemDict)
+
+    def toDict(self):
+        itemDict = {
+            "owner": self.__owner,
+            "id": self.__id,
+            "label": self.__label,
+            "description": self.__description,
+        }
+
+        for attribute in self.__attributes:
+            itemDict[attribute['name']] = attribute['value']
+
+        return itemDict

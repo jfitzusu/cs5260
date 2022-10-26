@@ -25,8 +25,8 @@ class WidgetRequestFactory:
         description = request.get('description')
 
 
-        if (requestType == "create" or requestType == "update") and (not label or not description):
-            return ErrorRequest("Malformed Request. Create and Update Requests Must have a Label and Description")
+        if (requestType == "create") and (not label or not description):
+            return ErrorRequest("Malformed Request. Create Requests Must have a Label and Description", widgetId)
 
         attributes = request.get('otherAttributes')
 
@@ -40,4 +40,4 @@ class WidgetRequestFactory:
             return DeleteRequest(requestId, widgetId, owner)
 
         else:
-            return ErrorRequest("Malformed Request. Unknown Type.")
+            return ErrorRequest("Malformed Request. Unknown Type.", widgetId)

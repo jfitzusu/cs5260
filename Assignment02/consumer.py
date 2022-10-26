@@ -2,6 +2,7 @@ import time
 import logging
 import click
 import boto3
+import sys
 from widgetfactory import WidgetFactory
 from widgetrequestfactory import WidgetRequestFactory
 from createrequest import CreateRequest
@@ -10,6 +11,7 @@ from deleterequest import DeleteRequest
 from errorrequest import ErrorRequest
 from s3puller import S3Puller
 from s3pusher import S3Pusher
+from ddbpusher import DDBPusher
 
 
 class Consumer:
@@ -69,10 +71,19 @@ class Consumer:
 
 @click.command()
 @click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
-@click.option('--wb', help='ID Of Bucket to Store Widgets In')
+@click.option('--wb', default=None, help='ID Of Bucket to Store Widgets In')
+@click.option('--wt', default=None, help='ID of Table to Store Widgets In (DynamoDB)')
 @click.option('--path', default='consumerlog.txt', help='Path to LogFile')
 @click.option('-v', is_flag=True, help='Verbose Mode')
-def main(rb, wb, path, v):
+def main(rb, wb, wt, path, v):
+    if (wb is None) and (wt is None):
+        print("Error: No Write Destination Specified. Use --help to See Options")
+        sys.exit(1)
+
+    if (wb is not None) and (wt is not None):
+        print("Error: Multiple Write Destinations Specified. Use --help to See Options")
+        sys.exit(1)
+
     # The Actual Nonsense You Have to Go Through for Python Logging
     loggerName = 'consumer'
     logger = logging.getLogger(loggerName)
@@ -91,10 +102,15 @@ def main(rb, wb, path, v):
     logger.setLevel(logging.INFO)
 
     pullBucket = boto3.resource('s3').Bucket(rb)
-    pushBucket = boto3.resource('s3').Bucket(wb)
-
     puller = S3Puller(pullBucket, loggerName)
-    pusher = S3Pusher(pushBucket, loggerName)
+
+    if wb is not None:
+        pushBucket = boto3.resource('s3').Bucket(wb)
+        pusher = S3Pusher(pushBucket, loggerName)
+    elif wt is not None:
+        pushTable = boto3.resource('dynamodb').Table(wt)
+        pusher = DDBPusher(pushTable, loggerName)
+
     consumer = Consumer(puller, pusher, loggerName)
     consumer.consume()
 
