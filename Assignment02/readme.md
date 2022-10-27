@@ -3,6 +3,8 @@
 ## How to Use:
 
 1. Install dependancies (below)
+1. Set up crendentials in .aws/credentials file
+1. Set up region (of table) in .aws/credentials file
 1. Navigate to src directory of this project in a cmd terminal
 1. Run `python consumer.py --help` to see usage syntax
 

@@ -72,7 +72,8 @@ class Consumer:
 @click.command()
 @click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
 @click.option('--wb', default=None, help='ID Of Bucket to Store Widgets In (Max 1 Storage Location Specifiable)')
-@click.option('--wt', default=None, help='ID of Table to Store Widgets In (DynamoDB) (Max 1 Storage Location Specifiable)')
+@click.option('--wt', default=None,
+              help='ID of Table to Store Widgets In (DynamoDB) (Max 1 Storage Location Specifiable)')
 @click.option('--path', default='consumerlog.txt', help='Path to LogFile')
 @click.option('-v', is_flag=True, help='Verbose Mode')
 def main(rb, wb, wt, path, v):
@@ -103,25 +104,30 @@ def main(rb, wb, wt, path, v):
 
     try:
         pullBucket = boto3.resource('s3').Bucket(rb)
+        # Tests That Bucket is Valid
+        for test in pullBucket.objects.limit(1):
+            pass
         puller = S3Puller(pullBucket, loggerName)
     except Exception:
-        print(f"Erro: No Such Bucket {rb}")
+        print(f"ERROR: No Such Bucket {rb}")
         sys.exit(1)
 
     if wb is not None:
         try:
             pushBucket = boto3.resource('s3').Bucket(wb)
+            # Test that Bucket Is Valid by Performing a Simple Request
+            for test in pushBucket.objects.limit(1):
+                pass
             pusher = S3Pusher(pushBucket, loggerName)
         except Exception:
             print(f"ERROR: No Such Bucket {wb}")
             sys.exit(1)
     elif wt is not None:
-        try:
-            pushTable = boto3.resource('dynamodb').Table(wt)
-            pusher = DDBPusher(pushTable, loggerName)
-        except Exception:
+        if wt not in boto3.client('dynamodb').list_tables()['TableNames']:
             print(f"Error: No Such Table {wt}")
             sys.exit(1)
+        pushTable = boto3.resource('dynamodb').Table(wt)
+        pusher = DDBPusher(pushTable, loggerName)
 
     consumer = Consumer(puller, pusher, loggerName)
     consumer.consume()
