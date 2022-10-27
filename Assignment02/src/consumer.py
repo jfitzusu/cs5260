@@ -101,15 +101,27 @@ def main(rb, wb, wt, path, v):
     logger.addHandler(fHandler)
     logger.setLevel(logging.INFO)
 
-    pullBucket = boto3.resource('s3').Bucket(rb)
-    puller = S3Puller(pullBucket, loggerName)
+    try:
+        pullBucket = boto3.resource('s3').Bucket(rb)
+        puller = S3Puller(pullBucket, loggerName)
+    except Exception:
+        print(f"Erro: No Such Bucket {rb}")
+        sys.exit(1)
 
     if wb is not None:
-        pushBucket = boto3.resource('s3').Bucket(wb)
-        pusher = S3Pusher(pushBucket, loggerName)
+        try:
+            pushBucket = boto3.resource('s3').Bucket(wb)
+            pusher = S3Pusher(pushBucket, loggerName)
+        except Exception:
+            print(f"ERROR: No Such Bucket {wb}")
+            sys.exit(1)
     elif wt is not None:
-        pushTable = boto3.resource('dynamodb').Table(wt)
-        pusher = DDBPusher(pushTable, loggerName)
+        try:
+            pushTable = boto3.resource('dynamodb').Table(wt)
+            pusher = DDBPusher(pushTable, loggerName)
+        except Exception:
+            print(f"Error: No Such Table {wt}")
+            sys.exit(1)
 
     consumer = Consumer(puller, pusher, loggerName)
     consumer.consume()
