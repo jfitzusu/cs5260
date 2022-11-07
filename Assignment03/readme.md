@@ -14,7 +14,8 @@
 python consumer.py
 
 ### Arguments:
---rb STRING -> ID of Bucket in Which Requests are Stored
+--rb STRING -> ID of Bucket in Which Requests are Stored (Incompatible with --rq)
+--rq STRING -> ID of SQS Queue in Which Reuquests are Published (Incompatible with --rb)
 --wb STRING -> ID of Bucket to Upload Widgets To (Incompatible with --wt)
 --wt STRING -> ID of DynamoDB Table to Upload Widgets To (Incompatible with --wb)
 -v FLAG -> Verbose Mode (Prints Info Messages)

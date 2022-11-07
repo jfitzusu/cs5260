@@ -19,8 +19,9 @@ class SQSPuller(Puller):
                 WaitTimeSeconds=5
             )
 
+
         for message in self.__cache:
-            try:
+            # try:
                 self.__logger.info(f'Checking Message {message.message_id} is Still Valid')
                 response = self.__resource.delete_messages(
                     Entries=[
@@ -30,13 +31,13 @@ class SQSPuller(Puller):
                         }
                     ]
                 )
-                if response.success:
+                if response['Successful']:
                     self.__logger.info(f'Message {message.message_id} Still Valid, Successfully Removed from Queue')
                 content = message.body
                 return content
 
-            except Exception:
-                self.__logger.info('Message Check Failed')
-                return None
+            # except Exception:
+            #     self.__logger.info('Message Check Failed')
+            #     return None
 
         return None

@@ -126,8 +126,10 @@ def main(rb, rq, wb, wt, path, v):
             print(f"ERROR: No Such Bucket {rb}")
             sys.exit(1)
     elif rq is not None:
+
         try:
-            pullQueue = boto3.resource('sqs').get_queue_by_name(QueueName=rq)
+            sqs = boto3.resource('sqs')
+            pullQueue = sqs.get_queue_by_name(QueueName=rq)
             puller = SQSPuller(pullQueue, loggerName)
         except Exception:
             print(f"Error: No Such Queue {rq}")
