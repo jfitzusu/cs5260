@@ -36,8 +36,8 @@ class SQSPuller(Puller):
                 content = message.body
                 return content
 
-            # except Exception:
-            #     self.__logger.info('Message Check Failed')
-            #     return None
+            except Exception:
+                self.__logger.info('Message Check Failed')
+                return None
 
         return None
