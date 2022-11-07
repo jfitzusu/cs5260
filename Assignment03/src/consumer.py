@@ -10,6 +10,7 @@ from updaterequest import UpdateRequest
 from deleterequest import DeleteRequest
 from errorrequest import ErrorRequest
 from s3puller import S3Puller
+from sqspuller import SQSPuller
 from s3pusher import S3Pusher
 from ddbpusher import DDBPusher
 
@@ -70,19 +71,30 @@ class Consumer:
 
 
 @click.command()
-@click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From')
+@click.option('--rb', help='ID Of Bucket to Retrieve Widget Requests From (Max 1 Retrieval Location Specifiable)')
+@click.option('--rq', help='ID Of Queue to Retrieve Widget Requests From (Max 1 Retrieval Location Specifiable)')
 @click.option('--wb', default=None, help='ID Of Bucket to Store Widgets In (Max 1 Storage Location Specifiable)')
 @click.option('--wt', default=None,
               help='ID of Table to Store Widgets In (DynamoDB) (Max 1 Storage Location Specifiable)')
 @click.option('--path', default='consumerlog.txt', help='Path to LogFile')
 @click.option('-v', is_flag=True, help='Verbose Mode')
-def main(rb, wb, wt, path, v):
+def main(rb, rq, wb, wt, path, v):
+
+    # Tests for Valid Arguments
     if (wb is None) and (wt is None):
         print("Error: No Write Destination Specified. Use --help to See Options")
         sys.exit(1)
 
     if (wb is not None) and (wt is not None):
         print("Error: Multiple Write Destinations Specified. Use --help to See Options")
+        sys.exit(1)
+
+    if (rb is None) and (rq is None):
+        print("Error: No Read Destination Specified. USe --help to See Options")
+        sys.exit(1)
+
+    if (rb is not None) and (rq is not None):
+        print("Error: Multiple Read Destinations Specified. USe --help to See Options")
         sys.exit(1)
 
     # The Actual Nonsense You Have to Go Through for Python Logging
@@ -102,15 +114,24 @@ def main(rb, wb, wt, path, v):
     logger.addHandler(fHandler)
     logger.setLevel(logging.INFO)
 
-    try:
-        pullBucket = boto3.resource('s3').Bucket(rb)
-        # Tests That Bucket is Valid
-        for test in pullBucket.objects.limit(1):
-            pass
-        puller = S3Puller(pullBucket, loggerName)
-    except Exception:
-        print(f"ERROR: No Such Bucket {rb}")
-        sys.exit(1)
+    # Tests for Valid Resources
+    if rb is not None:
+        try:
+            pullBucket = boto3.resource('s3').Bucket(rb)
+            # Tests That Bucket is Valid
+            for test in pullBucket.objects.limit(1):
+                pass
+            puller = S3Puller(pullBucket, loggerName)
+        except Exception:
+            print(f"ERROR: No Such Bucket {rb}")
+            sys.exit(1)
+    elif rq is not None:
+        try:
+            pullQueue = boto3.resource('sqs').get_queue_by_name(QueueName=rq)
+            puller = SQSPuller(pullQueue, loggerName)
+        except Exception:
+            print(f"Error: No Such Queue {rq}")
+            sys.exit(1)
 
     if wb is not None:
         try:
@@ -128,6 +149,7 @@ def main(rb, wb, wt, path, v):
             sys.exit(1)
         pushTable = boto3.resource('dynamodb').Table(wt)
         pusher = DDBPusher(pushTable, loggerName)
+
 
     consumer = Consumer(puller, pusher, loggerName)
     consumer.consume()
