@@ -2,9 +2,8 @@ import logging
 import time
 from pusher import Pusher
 
-
 MAX_TRIES = 5
-class S3Pusher(Pusher):
+class DDBPusher(Pusher):
     def __init__(self, resource, loggerName):
         super().__init__(resource, loggerName)
         self.__resource = resource
@@ -14,14 +13,13 @@ class S3Pusher(Pusher):
         tries = 0
         while tries < MAX_TRIES:
             try:
-                self.__logger.info(f"Attempting to Upload Widget to widgets/{widget.getOwner().replace(' ', '-').lower()}/{widget.getId()}...")
-                self.__resource.put_object(Body=bytes(widget.toJson(), 'utf-8'), Key=f"widgets/{widget.getOwner().replace(' ', '-').lower()}/{widget.getId()}")
+                self.__logger.info(f"Attempting to Upload Widget to {self.__resource.name} Table...")
+                self.__resource.put_item(Item=widget.toDict())
                 self.__logger.info("Upload Success")
                 return
             except Exception:
                 tries += 1
                 time.sleep(0.1)
-
         self.__logger.info("Upload Failed")
 
 
