@@ -21,7 +21,7 @@ class SQSPuller(Puller):
 
 
         for message in self.__cache:
-            # try:
+            try:
                 self.__logger.info(f'Checking Message {message.message_id} is Still Valid')
                 response = self.__resource.delete_messages(
                     Entries=[
