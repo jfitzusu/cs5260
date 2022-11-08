@@ -27,4 +27,9 @@ class DDBPusher(Pusher):
         pass
 
     def delete(self, item):
-        self.__logger
+        self.__logger.info(f"Attempting to Delete Widget {item.getWidgetId()}...")
+        try:
+            self.__resource.delete_item(Key={'id': item.getWidgetId()})
+            self.__logger.info("Widget Deleted Successfully")
+        except Exception:
+            self.__logger.warning(f"Error: Widget {item.getWidgetId()} Does Not Exist")
