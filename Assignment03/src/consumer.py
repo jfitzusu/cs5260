@@ -22,18 +22,19 @@ class Consumer:
         self.__logger = logging.getLogger(loggerName)
 
     def consume(self, timeout=30):
-        waitTime = 0
+        startTime = time.time()
+        currentTime = time.time()
         self.__logger.info('Fetching Requests...')
-        while waitTime < timeout:
+        while currentTime - startTime < timeout:
             nextItem = self.__puller.getNext()
             if nextItem:
-
                 self.__processItem(nextItem)
-                waitTime = 0
+                currentTime = time.time()
+                startTime = time.time()
             else:
                 # No Log Statement Here, Would Lead to Spam
                 time.sleep(0.1)
-                waitTime += 0.1
+                currentTime = time.time()
         self.__logger.info('No Requests Left to Process. Shutting Down...')
 
     def __processItem(self, item):
@@ -66,8 +67,8 @@ class Consumer:
         pass
 
     def __processDelete(self, widgetRequest):
-        # self.__logger.info(f'Request Type: Delete')
-        pass
+        self.__logger.info('Request Type: Deletion')
+        self.__pusher.delete(widgetRequest)
 
 
 @click.command()

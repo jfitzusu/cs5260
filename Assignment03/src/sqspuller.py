@@ -16,28 +16,32 @@ class SQSPuller(Puller):
             self.__cache = self.__resource.receive_messages(
                 MaxNumberOfMessages=10,
                 VisibilityTimeout=30,
-                WaitTimeSeconds=5
+                WaitTimeSeconds=15
             )
 
 
-        for message in self.__cache:
+        if len(self.__cache ) > 0:
             try:
-                self.__logger.info(f'Checking Message {message.message_id} is Still Valid')
+                self.__logger.info(f'Checking Message {self.__cache[0].message_id} is Still Valid')
                 response = self.__resource.delete_messages(
                     Entries=[
                         {
-                            'Id': message.message_id,
-                            'ReceiptHandle': message.receipt_handle
+                            'Id': self.__cache[0].message_id,
+                            'ReceiptHandle': self.__cache[0].receipt_handle
                         }
                     ]
                 )
                 if response['Successful']:
-                    self.__logger.info(f'Message {message.message_id} Still Valid, Successfully Removed from Queue')
-                content = message.body
+                    self.__logger.info(f'Message {self.__cache[0].message_id} Still Valid, Successfully Removed from Queue')
+
+                content = self.__cache[0].body
+                self.__cache.pop(0)
                 return content
 
             except Exception:
+                self.__cache.pop(0)
                 self.__logger.info('Message Check Failed')
                 return None
-
+        else:
+            self.__logger.info("No Messages in Queue")
         return None

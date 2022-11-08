@@ -27,4 +27,4 @@ class DDBPusher(Pusher):
         pass
 
     def delete(self, item):
-        pass
+        self.__logger

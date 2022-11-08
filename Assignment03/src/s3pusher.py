@@ -29,4 +29,16 @@ class S3Pusher(Pusher):
         pass
 
     def delete(self, item):
-        pass
+        self.__logger.info(f"Checking if Widget {item.getWidgetId()} Exists...")
+        try:
+            response = self.__resource.Object(f"widgets/{item.getOwner()}/{item.getWidgetId()}")
+        except Exception:
+            self.__logger.warning(f"Error: Widget {item.getWidgetId()} Does Not Exist")
+            return
+
+        try:
+            response.delete()
+            self.__logger.info("Widget Deleted Successfully")
+        except Exception:
+            self.__logger.info(f"Error: Failed to Delete Widget {item.getWidgetId()} (Reason Unknown)")
+
