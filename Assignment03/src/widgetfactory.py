@@ -12,4 +12,24 @@ class WidgetFactory:
 
     @staticmethod
     def updateWidget(oldWidget, request):
-        pass
+        if request.getLabel() is not None:
+            if request.getLabel() == '':
+                oldWidget.setLablel(None)
+            else:
+                oldWidget.setLablel(request.getLabel())
+
+        if request.getDescription() is not None:
+            if request.getDescription() == '':
+                oldWidget.setLablel(None)
+            else:
+                oldWidget.setLablel(request.getLabel())
+
+        if request.getAttributes() is not None:
+            newAttributes = oldWidget.getAttributes()
+            for key, value in request.getAttributes():
+                if value == '':
+                    del newAttributes[key]
+                else:
+                    newAttributes[key] = value
+            oldWidget.setAttributes(newAttributes)
+

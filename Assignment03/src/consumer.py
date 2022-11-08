@@ -63,8 +63,11 @@ class Consumer:
         self.__pusher.create(widget)
 
     def __processUpdate(self, widgetRequest):
-        # self.__logger.info('Request Type: Update')
-        pass
+        self.__logger.info("Request Type: Update")
+        originalJSON = self.__pusher.pullDown()
+        originalWidget = WidgetFactory.widgetFromRequest(originalJSON)
+        WidgetFactory.updateWidget(originalWidget, widgetRequest)
+        self.__pusher.update(originalWidget)
 
     def __processDelete(self, widgetRequest):
         self.__logger.info('Request Type: Deletion')

@@ -22,9 +22,28 @@ class DDBPusher(Pusher):
                 time.sleep(0.1)
         self.__logger.info("Upload Failed")
 
+    def pullDown(self, item):
+        self.__logger.info(f"Attempting to Pull Down Widget {item.getWidgetId()}")
+        try:
+            response = self.__resource.get_item(Key={'id': item.getWidgetId()})
+            self.__logger.info("Pull Down Successful")
+            return response['Item']
+        except Exception:
+            self.__logger.warning(f"Error: Widget {item.getWidgetId()} Does Not Exist")
 
-    def update(self, item):
-        pass
+
+    def update(self, widget):
+        tries = 0
+        while tries < MAX_TRIES:
+            try:
+                self.__logger.info(f"Attempting to Upload New Widget to {self.__resource.name} Table...")
+                self.__resource.put_item(Item=widget.toDict())
+                self.__logger.info("Upload Success")
+                return
+            except Exception:
+                tries += 1
+                time.sleep(0.1)
+        self.__logger.info("Upload Failed")
 
     def delete(self, item):
         self.__logger.info(f"Attempting to Delete Widget {item.getWidgetId()}...")

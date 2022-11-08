@@ -7,6 +7,9 @@ class Pusher:
     def create(self, item):
         pass
 
+    def pullDown(self, item):
+        pass
+
     def update(self, item):
         pass
 
