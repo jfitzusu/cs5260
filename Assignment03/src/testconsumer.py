@@ -1,6 +1,8 @@
+import copy
 import json
 import logging
 import random
+import time
 import unittest
 from widgetfactory import WidgetFactory
 from widget import Widget
@@ -14,6 +16,7 @@ from updaterequest import UpdateRequest
 from deleterequest import DeleteRequest
 from errorrequest import ErrorRequest
 from s3puller import S3Puller
+from sqspuller import SQSPuller
 from s3pusher import S3Pusher
 from ddbpusher import DDBPusher
 from consumer import Consumer
@@ -21,17 +24,24 @@ from consumer import main as testMain
 import boto3
 
 TEST_REQUEST = b'{"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
-TEST_WR = WidgetRequestFactory.fromRawJSON(TEST_REQUEST)
-TEST_W = WidgetFactory.widgetFromRequest(TEST_WR)
+TEST_UPDATE = b'{"type":"update","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"notadescription","otherAttributes":[{"name":"height-unit","value":""},{"name":"vendor","value":"QEJHXIN"}]}'
+TEST_DELETE = b'{"type":"delete","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
+TEST_WRC = WidgetRequestFactory.fromRawJSON(TEST_REQUEST)
+TEST_WRU = WidgetRequestFactory.fromRawJSON(TEST_UPDATE)
+TEST_WRD = WidgetRequestFactory.fromRawJSON(TEST_DELETE)
+TEST_W = WidgetFactory.widgetFromRequest(TEST_WRC)
+UPDATED_W = copy.deepcopy(TEST_W)
+WidgetFactory.updateWidget(UPDATED_W, TEST_WRU)
 TEST_BUCKET_PULL = "usu-cs5260-snarl-test"
 TEST_BUCKET_PUSH = "usu-cs5260-snarl-test"
+TEST_SQS_PULL = 'TestQueue'
 TEST_TABLE = 'widgets'
 
 class ConsumerTest(unittest.TestCase):
 
     def testWRF(self):
         print('\n***** Unit Test 01: Test WidgetRequestFactory ************')
-        widgetRequest = TEST_WR
+        widgetRequest = TEST_WRC
         assert isinstance(widgetRequest, CreateRequest)
         assert widgetRequest.getWidgetId() == "faa894d8-109d-472c-80ca-91b04c523bc7"
         assert widgetRequest.getRequestId() == "74fedd3c-40ad-4df4-a759-bab394bdb1c1"
@@ -48,7 +58,7 @@ class ConsumerTest(unittest.TestCase):
     def testWF(self):
         print('\n***** Unit Test 02: Test WidgetFactory ************')
 
-        widget = TEST_W
+        widget = copy.deepcopy(TEST_W)
         assert isinstance(widget, Widget)
         assert widget.getId() == "faa894d8-109d-472c-80ca-91b04c523bc7"
         assert widget.getOwner() == "Henry Hops"
@@ -56,8 +66,14 @@ class ConsumerTest(unittest.TestCase):
         assert widget.getDescription() == "IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC"
         assert widget.getAttributes() == [{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]
 
-        widget.setOwner("lmao")
-        assert widget.getOwner() == "lmao"
+
+        WidgetFactory.updateWidget(widget, TEST_WRU)
+
+        assert widget.getId() == "faa894d8-109d-472c-80ca-91b04c523bc7"
+        assert widget.getOwner() == "Henry Hops"
+        assert widget.getLabel() == "JKBI"
+        assert widget.getDescription() == "notadescription"
+        assert widget.getAttributes() == [{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]
 
         print('Unit Test 02: Test WidgetFactory: Pass')
 
@@ -101,7 +117,7 @@ class ConsumerTest(unittest.TestCase):
 
             bucket.put_object(Body=bytes('lmao', 'utf-8'), Key=str(randKey))
         except Exception:
-            print('Unit Test 05: Test Puller: Unable to Complete')
+            print('Unit Test 05: Test S3Puller: Unable to Complete')
 
         puller = S3Puller(bucket, 'lmao')
         item = puller.getNext()
@@ -109,8 +125,28 @@ class ConsumerTest(unittest.TestCase):
 
         print('Unit Test 05: Test S3Puller: Pass')
 
-    def testPush(self):
-        print('\n***** Unit Test 06: Test S3Pusher ************')
+    def testPull2(self):
+        print('\n***** Unit Test 06: Test SQSPuller ************')
+        sqs = boto3.resource('sqs')
+        pullQueue = sqs.get_queue_by_name(QueueName=TEST_SQS_PULL)
+        try:
+            pullQueue.purge()
+            time.sleep(60)
+            pullQueue.send_message(
+                MessageBody='lmao'
+            )
+        except Exception:
+            print(Exception)
+            print('Unit Test 06: Test SQSPuller: Unable to Complete')
+            self.fail()
+
+        puller = SQSPuller(pullQueue, 'lmao')
+        item = puller.getNext()
+        assert item == 'lmao'
+        print('Unit Test 06: Test SQSPuller: Pass')
+
+    def testPusher(self):
+        print('\n***** Unit Test 07: Test S3Pusher ************')
 
         bucket = boto3.resource('s3').Bucket(TEST_BUCKET_PULL)
         try:
@@ -118,46 +154,51 @@ class ConsumerTest(unittest.TestCase):
                 item = bucket.Object(itemSummary.key)
                 item.delete()
         except Exception:
-            print('Unit Test 05: Test Puller: Unable to Complete')
+            print('Unit Test 07: Test S3Pusher: Unable to Complete')
+            self.fail()
 
         pusher = S3Pusher(bucket, 'lmao')
         pusher.create(TEST_W)
 
-        itemSummary = list(bucket.objects.limit(1))[0]
+        item = pusher.pullDown(TEST_WRU)
+        print(item)
+        assert item == b'{"owner": "Henry Hops", "id": "faa894d8-109d-472c-80ca-91b04c523bc7", "label": "JKBI", "description": "IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC", "otherAttributes": [{"name": "height-unit", "value": "cm"}, {"name": "price", "value": "47.48"}, {"name": "vendor", "value": "QEJHXIN"}]}'
 
-        item = bucket.Object(itemSummary.key)
-        content = item.get()['Body'].read()
-        item.delete()
+        pusher.delete(TEST_WRD)
 
-        assert json.loads(content)['owner'] == "Henry Hops"
-
-
-
-        print('Unit Test 06: Test S3Pusher: Pass')
+        with self.assertRaises(Exception):
+            response = bucket.Object(f"widgets/{item.getOwner()}/{item.getWidgetId()}")
+            item = response.get()['Body'].read()
 
 
-    def testPush2(self):
-        print('\n***** Unit Test 07: Test DDBPusher ************')
+        print('Unit Test 07: Test S3Pusher: Pass')
+
+
+    def testPusher2(self):
+        print('\n***** Unit Test 08: Test DDBPusher ************')
 
         table = boto3.resource('dynamodb').Table(TEST_TABLE)
 
         pusher = DDBPusher(table, 'lmao')
         pusher.create(TEST_W)
 
-        item = table.get_item(Key={
-            'id': TEST_W.getId()
-        })['Item']
-
-        table.get_item(Key={
-            'id': TEST_W.getId()
-        })
+        item = pusher.pullDown(TEST_WRU)
 
         assert item['owner'] == "Henry Hops"
 
-        print('Unit Test 07: Test DDBPusher: Pass')
+
+        pusher.delete(TEST_WRD)
+
+        with self.assertRaises(KeyError):
+            item = table.get_item(Key={
+                'id': TEST_W.getId()
+            })['Item']
+
+        print('Unit Test 08: Test DDBPusher: Pass')
+
 
     def testConsumer(self):
-        print('\n***** Unit Test 08: Test Consumer ************')
+        print('\n***** Unit Test 09: Test Consumer ************')
         pusher = DummyPusher(None, None)
         puller = DummyPuller(None, None)
         logger = logging.getLogger('lmao')
@@ -167,7 +208,12 @@ class ConsumerTest(unittest.TestCase):
         newConsumer.consume()
 
         assert pusher.result == TEST_W.toDict()
-        print('Unit Test 08: Test Consumer: Pass')
+        assert pusher.newResult == UPDATED_W.toDict()
+        assert pusher.garbage == TEST_W.toDict()
+
+
+        print('Unit Test 09: Test Consumer: Pass')
+
 
     def runTest(self):
         pass
@@ -176,23 +222,45 @@ class ConsumerTest(unittest.TestCase):
 class DummyPuller(Puller):
     def __init__(self, resource, loggerName):
         super().__init__(resource, loggerName)
-        self.__returned = False
+        self.__returned = 0
 
     def getNext(self):
-        if not self.__returned:
-            self.__returned = True
+        if self.__returned < 1:
+            self.__returned += 1
             return TEST_REQUEST
-        else:
-            return None
+        if self.__returned < 2:
+            self.__returned += 1
+            return TEST_UPDATE
+        if self.__returned < 3:
+            self.__returned += 1
+            return TEST_DELETE
+        return None
 
 
 class DummyPusher(Pusher):
     def __init__(self, resource, loggerName):
         super().__init__(resource, loggerName)
         self.result = ""
+        self.json = ""
+        self.newResult = ""
+        self.garbage = ""
 
     def create(self, item):
         self.result = item.toDict()
+        self.json = item.toJson()
+
+    def pullDown(self, item):
+        if item.getWidgetId() == self.result['id']:
+            return self.json
+        else:
+            return None
+
+    def update(self, item):
+        self.newResult = item.toDict()
+
+    def delete(self, item):
+        self.garbage = self.result
+
 
 
 

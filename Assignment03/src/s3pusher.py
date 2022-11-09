@@ -29,13 +29,13 @@ class S3Pusher(Pusher):
     def pullDown(self, item):
         self.__logger.info(f"Attempting to Pull Down Widget {item.getWidgetId()}...")
         try:
-            response = self.__resource.Object(f"widgets/{item.getOwner()}/{item.getWidgetId()}")
+            response = self.__resource.Object(f"widgets/{item.getOwner().replace(' ', '-').lower()}/{item.getWidgetId()}")
             item = response.get()['Body'].read()
             self.__logger.info("Pull Down Successful")
             return item
 
         except Exception:
-            self.__logger.warning(f'Error: Widget {item.getWidgetId} Does Not Exist')
+            self.__logger.warning(f'Error: Widget {item.getWidgetId()} Does Not Exist')
             return None
 
     def update(self, widget):

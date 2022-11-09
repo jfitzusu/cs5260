@@ -21,7 +21,7 @@ class Consumer:
         self.__pusher = pusher
         self.__logger = logging.getLogger(loggerName)
 
-    def consume(self, timeout=30):
+    def consume(self, timeout=1):
         startTime = time.time()
         currentTime = time.time()
         self.__logger.info('Fetching Requests...')
@@ -64,8 +64,8 @@ class Consumer:
 
     def __processUpdate(self, widgetRequest):
         self.__logger.info("Request Type: Update")
-        originalJSON = self.__pusher.pullDown()
-        originalWidget = WidgetFactory.widgetFromRequest(originalJSON)
+        originalJSON = self.__pusher.pullDown(widgetRequest)
+        originalWidget = WidgetFactory.widgetFromJSON(originalJSON)
         WidgetFactory.updateWidget(originalWidget, widgetRequest)
         self.__pusher.update(originalWidget)
 

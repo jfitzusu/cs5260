@@ -1,4 +1,5 @@
 from widget import Widget
+import json
 
 
 class WidgetFactory:
@@ -11,25 +12,42 @@ class WidgetFactory:
                       request.getAttributes())
 
     @staticmethod
+    def widgetFromJSON(rawJson):
+        dict = json.loads(rawJson)
+
+        widgetId = dict.get('id')
+        owner = dict.get('owner')
+        label = dict.get('label')
+        desc = dict.get('description')
+        attrib = dict.get('otherAttributes')
+        return Widget(widgetId, owner, label, desc, attrib)
+
+    @staticmethod
     def updateWidget(oldWidget, request):
         if request.getLabel() is not None:
             if request.getLabel() == '':
-                oldWidget.setLablel(None)
+                oldWidget.setLabel(None)
             else:
-                oldWidget.setLablel(request.getLabel())
+                oldWidget.setLabel(request.getLabel())
 
         if request.getDescription() is not None:
             if request.getDescription() == '':
-                oldWidget.setLablel(None)
+                oldWidget.setDescription(None)
             else:
-                oldWidget.setLablel(request.getLabel())
+                oldWidget.setDescription(request.getDescription())
 
         if request.getAttributes() is not None:
             newAttributes = oldWidget.getAttributes()
-            for key, value in request.getAttributes():
-                if value == '':
-                    del newAttributes[key]
-                else:
-                    newAttributes[key] = value
+            updateList = request.getAttributes()
+            for item in updateList:
+                for i in range(len(newAttributes)):
+                    if newAttributes[i]['name'] == item['name']:
+                        if item['value'] == '':
+                            newAttributes.pop(i)
+                            break
+                        elif item['value'] is None:
+                            break
+                        else:
+                            newAttributes[i]['value'] = item['value']
             oldWidget.setAttributes(newAttributes)
 
