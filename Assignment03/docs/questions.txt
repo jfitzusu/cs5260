@@ -1,0 +1,7 @@
+1. Why is possible that Update and Delete Widget Requests may fail, even when you were
+running just one Consumer?
+A: Because a default SQS queue implements "at least once" message delievery. That is, there may be duplicate messages in the queue. This means that eveb if our consumer program already processed a request (e.g. delete), there may be another version of that exact same request in the queue. When our consumer goes to execute that duplicate request, it may try to access resources that don't exist (e.g. already deleted). This leads to a warning.
+
+2. How would this possible behavior impact the design of distributed applications that use
+queues?
+A: They have to implement practices to ensure that duplicate messages in a queue does not lead to compounding results. In a lot of cases, if your process cares about duplicate messages, it's better just to select a SQS FIFO queue, to make sure duplicates don't exist. Otherwise, you just need to make sure your program can handle invalid requests, like we did, or that duplicate requests don't compound results. This can be accomplished in a variety of ways, be it reformatting your requests, checking before you execute requests, or any other method you can think of. Basically, your applications need to be robust. 
