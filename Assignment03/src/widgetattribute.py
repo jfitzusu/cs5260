@@ -7,12 +7,10 @@ class WidgetAttribute:
         return self.__name
 
     def setName(self, newName):
-        assert type(newName) == str
         self.__name = newName
 
     def getValue(self):
         return self.__value
 
     def setValue(self, newValue):
-        assert type(newValue) == str
         self.__value = newValue

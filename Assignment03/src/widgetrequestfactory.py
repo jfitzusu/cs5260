@@ -24,9 +24,6 @@ class WidgetRequestFactory:
         label = request.get('label')
         description = request.get('description')
 
-        if (requestType == "create") and (not label or not description):
-            return ErrorRequest("Malformed Request. Create Requests Must have a Label and Description", widgetId)
-
         attributes = request.get('otherAttributes')
 
         if requestType == "create":

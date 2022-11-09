@@ -9,19 +9,16 @@ class WidgetRequest:
         return self.__requestId
 
     def setRequestId(self, newId):
-        assert type(newId) == str
         self.__requestId = newId
 
     def getWidgetId(self):
         return self.__widgetId
 
     def setWidgetId(self, newId):
-        assert type(newId) == str
         self.__widgetId = newId
 
     def getOwner(self):
         return self.__owner
 
     def setOwner(self, newOwner):
-        assert type(newOwner) == str
         self.__owner = newOwner

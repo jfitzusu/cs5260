@@ -21,7 +21,7 @@ class S3Puller(Puller):
                 self.__logger.info('Object Deleted')
                 return read
 
-            except self.__resource.exceptions.NoSuchKey:
+            except Exception:
                 self.__logger.info('Read Failed')
                 return None
 

@@ -13,7 +13,10 @@ class WidgetFactory:
 
     @staticmethod
     def widgetFromJSON(rawJson):
-        dict = json.loads(rawJson)
+        if type(rawJson) == str:
+            dict = json.loads(rawJson)
+        else:
+            dict = rawJson
 
         widgetId = dict.get('id')
         owner = dict.get('owner')

@@ -11,21 +11,18 @@ class CreateRequest(WidgetRequest):
         return self.__label
 
     def setLabel(self, newLabel):
-        assert type(newLabel) == str
         self.__label = newLabel
 
     def getDescription(self):
         return self.__description
 
     def setDescription(self, newDescription):
-        assert type(newDescription) == str
         self.__description = newDescription
 
     def getAttributes(self):
         return self.__attributes
 
     def setAttributes(self, newAttributes):
-        assert type(newAttributes) == list
         self.__attributes = newAttributes
 
 

@@ -29,6 +29,8 @@ class S3Pusher(Pusher):
     def pullDown(self, item):
         self.__logger.info(f"Attempting to Pull Down Widget {item.getWidgetId()}...")
         try:
+
+
             response = self.__resource.Object(f"widgets/{item.getOwner().replace(' ', '-').lower()}/{item.getWidgetId()}")
             item = response.get()['Body'].read()
             self.__logger.info("Pull Down Successful")

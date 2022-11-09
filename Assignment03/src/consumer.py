@@ -21,7 +21,7 @@ class Consumer:
         self.__pusher = pusher
         self.__logger = logging.getLogger(loggerName)
 
-    def consume(self, timeout=1):
+    def consume(self, timeout=30):
         startTime = time.time()
         currentTime = time.time()
         self.__logger.info('Fetching Requests...')
@@ -65,6 +65,8 @@ class Consumer:
     def __processUpdate(self, widgetRequest):
         self.__logger.info("Request Type: Update")
         originalJSON = self.__pusher.pullDown(widgetRequest)
+        if originalJSON is None:
+            return
         originalWidget = WidgetFactory.widgetFromJSON(originalJSON)
         WidgetFactory.updateWidget(originalWidget, widgetRequest)
         self.__pusher.update(originalWidget)
@@ -130,7 +132,6 @@ def main(rb, rq, wb, wt, path, v):
             print(f"ERROR: No Such Bucket {rb}")
             sys.exit(1)
     elif rq is not None:
-
         try:
             sqs = boto3.resource('sqs')
             pullQueue = sqs.get_queue_by_name(QueueName=rq)
