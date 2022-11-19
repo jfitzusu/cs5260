@@ -1,0 +1,42 @@
+# Widget Consumer Documentation
+
+## How to Use:
+
+1. Install dependancies (below)
+1. Set up crendentials in .aws/credentials file
+1. Set up region (of table) in .aws/credentials file
+1. Navigate to src directory of this project in a cmd terminal
+1. Run `python consumer.py --help` to see usage syntax
+
+## Usage Syntax:
+
+### Base Command:
+python consumer.py
+
+### Arguments:
+--rb STRING -> ID of Bucket in Which Requests are Stored (Incompatible with --rq)
+--rq STRING -> ID of SQS Queue in Which Reuquests are Published (Incompatible with --rb)
+--wb STRING -> ID of Bucket to Upload Widgets To (Incompatible with --wt)
+--wt STRING -> ID of DynamoDB Table to Upload Widgets To (Incompatible with --wb)
+-v FLAG -> Verbose Mode (Prints Info Messages)
+--path STRING -> Path to Log File
+
+## Dependancies
+
+#### Python version 3.10 or Greater
+```
+https://www.python.org/downloads/
+```
+
+#### Boto3 Python Module
+```
+pip install boto3
+```
+
+#### Click Python Module
+```
+pip install click
+```
+
+## Tests
+To run the tests, navigate to the source folder, open a CLI, and run python testconsumer.py.
