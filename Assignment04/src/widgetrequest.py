@@ -4,7 +4,6 @@ class WidgetRequest:
         self.__widgetId = widgetId
         self.__owner = owner
 
-
     def getRequestId(self):
         return self.__requestId
 

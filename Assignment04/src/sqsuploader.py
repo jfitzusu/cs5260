@@ -8,4 +8,7 @@ class SQSUploader(Uploader):
         self.__logger = logging.getLogger(loggerName)
 
     def upload(self, request):
-        pass
+        self.__logger.info(f"Attempting to Upload {request}")
+        self.__queue.send_message(
+            MessageBody=request.toString()
+        )
