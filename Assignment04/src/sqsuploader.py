@@ -9,6 +9,10 @@ class SQSUploader(Uploader):
 
     def upload(self, request):
         self.__logger.info(f"Attempting to Upload {request}")
-        self.__queue.send_message(
+        result = self.__queue.send_message(
             MessageBody=request.toString()
         )
+        if result['HTTPStatusCode'] == 200:
+            return 200
+
+        return 500

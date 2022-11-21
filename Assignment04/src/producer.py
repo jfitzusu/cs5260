@@ -1,7 +1,7 @@
 import logging
 import boto3
 from responder import Responder
-from uploader import Uploader
+from sqsuploader import SQSUploader
 from widgetrequest import WidgetRequest
 from widgetrequestfactory import WidgetRequestFactory
 from errorrequest import ErrorRequest
@@ -20,13 +20,13 @@ class Producer:
 
         if isinstance(widgetRequest, ErrorRequest):
             self.__logger.warning(f"Error: Invalid Format. Terminating")
-            self.__respond(2)
-            return
+            return self.__respond(400)
+
 
         self.__logger.info(f"Request Valid. Attempting to Upload...")
         result = self.__upload(widgetRequest)
         self.__logger.info(f"Upload Result: {result}")
-        self.__respond(result)
+        return self.__respond(result)
 
 
     def __parse(self, body):
@@ -37,10 +37,11 @@ class Producer:
         return self.__uploader.upload(request)
 
     def __respond(self, code):
-        self.__responder.respond(code)
+        return self.__responder.respond(code)
 
 
-def produce(body):
+def produce(event):
+    body = event.get('body')
     loggerName = 'producer'
     logger = logging.getLogger(loggerName)
 
@@ -56,6 +57,7 @@ def produce(body):
     sqs = boto3.resource('sqs')
     queue = sqs.get_queue_by_name(QueueName=QUEUE)
     responder = Responder('producer')
-    uploader = Uploader(queue, 'producer')
+    uploader = SQSUploader(queue, 'producer')
     processor = Producer(responder, uploader, 'producer')
-    processor.process(body)
+    result = processor.process(body)
+    return result

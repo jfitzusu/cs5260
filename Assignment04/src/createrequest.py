@@ -1,4 +1,5 @@
 from widgetrequest import WidgetRequest
+import json
 
 class CreateRequest(WidgetRequest):
     def __init__(self, requestId, widgetId, owner, label, description, attributes=None):
@@ -25,4 +26,18 @@ class CreateRequest(WidgetRequest):
     def setAttributes(self, newAttributes):
         self.__attributes = newAttributes
 
+    def toString(self):
+        itemDict = {
+            "type": "create",
+            "requestId": self.getRequestId(),
+            "widgetId": self.getWidgetId(),
+            "owner": self.getOwner(),
+            "label": self.__label,
+            "description": self.__description,
+        }
+
+        if self.__attributes:
+            itemDict['otherAttributes'] = self.__attributes
+
+        return json.dumps(itemDict, separators=(',', ':'))
 

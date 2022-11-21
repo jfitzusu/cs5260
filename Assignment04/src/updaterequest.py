@@ -1,4 +1,5 @@
 from widgetrequest import WidgetRequest
+import json
 
 class UpdateRequest(WidgetRequest):
     def __init__(self, requestId, widgetId, owner, label, description, attributes=None):
@@ -27,3 +28,18 @@ class UpdateRequest(WidgetRequest):
     def setAttributes(self, newAttributes):
         assert type(newAttributes) == list
         self.__attributes = newAttributes
+
+    def toString(self):
+        itemDict = {
+            "type": "update",
+            "requestId": self.getRequestId(),
+            "widgetId": self.getWidgetId(),
+            "owner": self.getOwner(),
+            "label": self.__label,
+            "description": self.__description,
+        }
+
+        if self.__attributes:
+            itemDict['otherAttributes'] = self.__attributes
+
+        return json.dumps(itemDict, separators=(',', ':'))

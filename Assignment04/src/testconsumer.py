@@ -22,10 +22,12 @@ from ddbpusher import DDBPusher
 from consumer import Consumer
 from consumer import main as testMain
 import boto3
+from sqsuploader import SQSUploader
+from responder import  Responder
 
 TEST_REQUEST = b'{"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
 TEST_UPDATE = b'{"type":"update","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"notadescription","otherAttributes":[{"name":"height-unit","value":""},{"name":"vendor","value":"QEJHXIN"}]}'
-TEST_DELETE = b'{"type":"delete","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
+TEST_DELETE = b'{"type":"delete","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops"}'
 TEST_WRC = WidgetRequestFactory.fromRawJSON(TEST_REQUEST)
 TEST_WRU = WidgetRequestFactory.fromRawJSON(TEST_UPDATE)
 TEST_WRD = WidgetRequestFactory.fromRawJSON(TEST_DELETE)
@@ -214,9 +216,53 @@ class ConsumerTest(unittest.TestCase):
 
         print('Unit Test 09: Test Consumer: Pass')
 
+    def testWR(self):
+        print('\n***** Unit Test 10: Test Widget Request Stringify ************')
+        assert TEST_WRC.toString() == TEST_REQUEST.decode('utf-8')
+        assert TEST_WRD.toString() == TEST_DELETE.decode('utf-8')
+        assert TEST_WRU.toString() == TEST_UPDATE.decode('utf-8')
+        print('Unit Test 10: Test Widget Request Stringify: Pass')
+
+    def testUploader(self):
+        print('\n***** Unit Test 11: Test Widget Request SQSUploader ************')
+        sqs = boto3.resource('sqs')
+        pushQueue = sqs.get_queue_by_name(QueueName=TEST_SQS_PULL)
+        pusher = SQSUploader(pushQueue, 'lmao')
+        try:
+            pushQueue.purge()
+            time.sleep(60)
+        except Exception:
+            print(Exception)
+            print('Unit Test 11: Test Widget Request SQSUploader: Unable to Complete')
+            self.fail()
+
+        pusher.upload(TEST_WRU)
+
+        puller = SQSPuller(pushQueue, 'lmao')
+        item = puller.getNext()
+        print(item)
+        print(TEST_WRU)
+        assert item == TEST_WRU.toString()
+        print('Unit Test 11: Test Widget Request SQSUploader: Pass')
+
+    def testResponder(self):
+        print('\n***** Unit Test 12: Test Responder ************')
+        myResponder = Responder('lmao')
+        response = myResponder.respond(200)
+        assert "Widget Request Uploaded Successfully" in response['body']
+        response = myResponder.respond(400)
+        assert "ERROR: Malformed Request" in response['body']
+        response = myResponder.respond(500)
+        assert "ERROR: Server Error" in response['body']
+        response = myResponder.respond(600)
+        assert "ERROR: Unknown Error" in response['body']
+        print('Unit Test 12: Test Responder: Pass')
 
     def runTest(self):
         pass
+
+
+
 
 
 class DummyPuller(Puller):

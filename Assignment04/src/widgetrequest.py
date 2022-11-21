@@ -21,3 +21,6 @@ class WidgetRequest:
 
     def setOwner(self, newOwner):
         self.__owner = newOwner
+
+    def toString(self):
+        pass
