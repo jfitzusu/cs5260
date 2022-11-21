@@ -1,0 +1,37 @@
+Test:
+{
+  "body": {"type":"update","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"notadescription","otherAttributes":[{"name":"height-unit","value":""},{"name":"vendor","value":"QEJHXIN"}]}
+}
+
+Reponse:
+Test Event Name
+updateEvent
+
+Response
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"Region \": \"us-east-1\", \"Result\": \"Widget Request Uploaded Successfully\"}"
+}
+
+Function Logs
+START RequestId: 72b7e56d-2b59-415d-b8da-1fb13fcfc17d Version: $LATEST
+[INFO] Processing Request {"type": "update", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops", "label": "JKBI", "description": "notadescription", "otherAttributes": [{"name": "height-unit", "value": ""}, {"name": "vendor", "value": "QEJHXIN"}]}
+[INFO] Processing Request {"type": "update", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops", "label": "JKBI", "description": "notadescription", "otherAttributes": [{"name": "height-unit", "value": ""}, {"name": "vendor", "value": "QEJHXIN"}]}
+[INFO]  2022-11-21T23:22:11.385Z  72b7e56d-2b59-415d-b8da-1fb13fcfc17d  Processing Request {"type": "update", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops", "label": "JKBI", "description": "notadescription", "otherAttributes": [{"name": "height-unit", "value": ""}, {"name": "vendor", "value": "QEJHXIN"}]}
+[INFO] Request Valid. Attempting to Upload...
+[INFO] Request Valid. Attempting to Upload...
+[INFO]  2022-11-21T23:22:11.385Z  72b7e56d-2b59-415d-b8da-1fb13fcfc17d  Request Valid. Attempting to Upload...
+[INFO] Attempting to Upload <updaterequest.UpdateRequest object at 0x7fdbc13043a0>
+[INFO] Attempting to Upload <updaterequest.UpdateRequest object at 0x7fdbc13043a0>
+[INFO]  2022-11-21T23:22:11.385Z  72b7e56d-2b59-415d-b8da-1fb13fcfc17d  Attempting to Upload <updaterequest.UpdateRequest object at 0x7fdbc13043a0>
+[INFO] Upload Result: 200
+[INFO] Upload Result: 200
+[INFO]  2022-11-21T23:22:11.421Z  72b7e56d-2b59-415d-b8da-1fb13fcfc17d  Upload Result: 200
+END RequestId: 72b7e56d-2b59-415d-b8da-1fb13fcfc17d
+REPORT RequestId: 72b7e56d-2b59-415d-b8da-1fb13fcfc17d  Duration: 284.09 ms Billed Duration: 285 ms Memory Size: 128 MB Max Memory Used: 66 MB
+
+Request ID
+72b7e56d-2b59-415d-b8da-1fb13fcfc17d

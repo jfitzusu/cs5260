@@ -12,7 +12,8 @@ class SQSUploader(Uploader):
         result = self.__queue.send_message(
             MessageBody=request.toString()
         )
-        if result['HTTPStatusCode'] == 200:
+
+        if result['ResponseMetadata']['HTTPStatusCode'] == 200:
             return 200
 
         return 500

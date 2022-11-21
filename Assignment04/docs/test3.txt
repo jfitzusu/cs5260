@@ -1,0 +1,41 @@
+Test:
+{
+  "body": {"type":"delete","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops"}
+}
+
+Reponse:
+Test Event Name
+deleteEvent
+
+Response
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"Region \": \"us-east-1\", \"Result\": \"Widget Request Uploaded Successfully\"}"
+}
+
+Function Logs
+START RequestId: 62cb3e97-2d8c-4100-8688-b103980a6e95 Version: $LATEST
+[INFO] Processing Request {"type": "delete", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops"}
+[INFO] Processing Request {"type": "delete", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops"}
+[INFO] Processing Request {"type": "delete", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops"}
+[INFO]  2022-11-21T23:23:02.049Z  62cb3e97-2d8c-4100-8688-b103980a6e95  Processing Request {"type": "delete", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops"}
+[INFO] Request Valid. Attempting to Upload...
+[INFO] Request Valid. Attempting to Upload...
+[INFO] Request Valid. Attempting to Upload...
+[INFO]  2022-11-21T23:23:02.049Z  62cb3e97-2d8c-4100-8688-b103980a6e95  Request Valid. Attempting to Upload...
+[INFO] Attempting to Upload <deleterequest.DeleteRequest object at 0x7fdbc1a8d5b0>
+[INFO] Attempting to Upload <deleterequest.DeleteRequest object at 0x7fdbc1a8d5b0>
+[INFO] Attempting to Upload <deleterequest.DeleteRequest object at 0x7fdbc1a8d5b0>
+[INFO]  2022-11-21T23:23:02.049Z  62cb3e97-2d8c-4100-8688-b103980a6e95  Attempting to Upload <deleterequest.DeleteRequest object at 0x7fdbc1a8d5b0>
+[INFO] Upload Result: 200
+[INFO] Upload Result: 200
+[INFO] Upload Result: 200
+[INFO]  2022-11-21T23:23:02.123Z  62cb3e97-2d8c-4100-8688-b103980a6e95  Upload Result: 200
+END RequestId: 62cb3e97-2d8c-4100-8688-b103980a6e95
+REPORT RequestId: 62cb3e97-2d8c-4100-8688-b103980a6e95  Duration: 252.83 ms Billed Duration: 253 ms Memory Size: 128 MB Max Memory Used: 66 MB
+
+Request ID
+62cb3e97-2d8c-4100-8688-b103980a6e95

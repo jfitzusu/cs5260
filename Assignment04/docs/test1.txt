@@ -1,0 +1,33 @@
+Test:
+{
+  "body": {"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}
+}
+
+Reponse:
+Test Event Name
+createEvent
+
+Response
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"Region \": \"us-east-1\", \"Result\": \"Widget Request Uploaded Successfully\"}"
+}
+
+Function Logs
+START RequestId: 6bed3a24-d2d6-4041-a47a-ade0c5bd5722 Version: $LATEST
+[INFO]	2022-11-21T23:20:06.867Z	6bed3a24-d2d6-4041-a47a-ade0c5bd5722	Processing Request {"type": "create", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops", "label": "JKBI", "description": "IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC", "otherAttributes": [{"name": "height-unit", "value": "cm"}, {"name": "price", "value": "47.48"}, {"name": "vendor", "value": "QEJHXIN"}]}
+[INFO]	2022-11-21T23:20:06.867Z	6bed3a24-d2d6-4041-a47a-ade0c5bd5722	Request Valid. Attempting to Upload...
+[INFO]	2022-11-21T23:20:06.867Z	6bed3a24-d2d6-4041-a47a-ade0c5bd5722	Attempting to Upload <createrequest.CreateRequest object at 0x7fdbc1a919d0>
+[INFO] Processing Request {"type": "create", "requestId": "74fedd3c-40ad-4df4-a759-bab394bdb1c1", "widgetId": "faa894d8-109d-472c-80ca-91b04c523bc7", "owner": "Henry Hops", "label": "JKBI", "description": "IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC", "otherAttributes": [{"name": "height-unit", "value": "cm"}, {"name": "price", "value": "47.48"}, {"name": "vendor", "value": "QEJHXIN"}]}
+[INFO] Request Valid. Attempting to Upload...
+[INFO] Attempting to Upload <createrequest.CreateRequest object at 0x7fdbc1a919d0>
+[INFO] Upload Result: 200
+[INFO]	2022-11-21T23:20:06.921Z	6bed3a24-d2d6-4041-a47a-ade0c5bd5722	Upload Result: 200
+END RequestId: 6bed3a24-d2d6-4041-a47a-ade0c5bd5722
+REPORT RequestId: 6bed3a24-d2d6-4041-a47a-ade0c5bd5722	Duration: 1298.47 ms	Billed Duration: 1299 ms	Memory Size: 128 MB	Max Memory Used: 65 MB	Init Duration: 275.13 ms
+
+Request ID
+6bed3a24-d2d6-4041-a47a-ade0c5bd5722

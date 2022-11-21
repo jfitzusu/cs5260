@@ -5,6 +5,7 @@ from sqsuploader import SQSUploader
 from widgetrequest import WidgetRequest
 from widgetrequestfactory import WidgetRequestFactory
 from errorrequest import ErrorRequest
+import json
 
 QUEUE = 'cs5260-requests'
 
@@ -40,8 +41,13 @@ class Producer:
         return self.__responder.respond(code)
 
 
-def produce(event):
-    body = event.get('body')
+def produce(event, context):
+    rawBody = event.get('body')
+    if not isinstance(rawBody, str):
+        body = json.dumps(rawBody)
+    else:
+        body = rawBody
+
     loggerName = 'producer'
     logger = logging.getLogger(loggerName)
 

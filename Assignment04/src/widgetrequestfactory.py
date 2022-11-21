@@ -13,6 +13,7 @@ class WidgetRequestFactory:
     def fromRawJSON(rawJson):
         request = json.loads(rawJson)
 
+
         requestType = request.get('type')
         requestId = request.get('requestId')
         widgetId = request.get('widgetId')

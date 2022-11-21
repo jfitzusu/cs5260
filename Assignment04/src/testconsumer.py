@@ -4,6 +4,8 @@ import logging
 import random
 import time
 import unittest
+
+import producer
 from widgetfactory import WidgetFactory
 from widget import Widget
 from widgetrequestfactory import WidgetRequestFactory
@@ -23,7 +25,9 @@ from consumer import Consumer
 from consumer import main as testMain
 import boto3
 from sqsuploader import SQSUploader
-from responder import  Responder
+from responder import Responder
+from producer import Producer
+from uploader import Uploader
 
 TEST_REQUEST = b'{"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
 TEST_UPDATE = b'{"type":"update","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"notadescription","otherAttributes":[{"name":"height-unit","value":""},{"name":"vendor","value":"QEJHXIN"}]}'
@@ -258,6 +262,17 @@ class ConsumerTest(unittest.TestCase):
         assert "ERROR: Unknown Error" in response['body']
         print('Unit Test 12: Test Responder: Pass')
 
+    def testProducer(self):
+        print('\n***** Unit Test 13: Test Producer ************')
+        myResponder = Responder('lmao')
+        myUploader = DummyUploader()
+        myProducer = Producer(myResponder, myUploader, 'lmao')
+        request = '{"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
+        myProducer.process(request)
+        print(TEST_WRC.toString())
+        assert myUploader.getRequest() == request
+        print('Unit Test 13: Test Producer: Pass')
+
     def runTest(self):
         pass
 
@@ -308,6 +323,15 @@ class DummyPusher(Pusher):
         self.garbage = self.result
 
 
+class DummyUploader(Uploader):
+    def __init__(self):
+        self.__uploaded = None
+
+    def upload(self, request):
+        self.__uploaded = request.toString()
+
+    def getRequest(self):
+        return self.__uploaded
 
 
 if __name__ == '__main__':
