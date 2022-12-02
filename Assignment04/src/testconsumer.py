@@ -266,7 +266,7 @@ class ConsumerTest(unittest.TestCase):
         print('\n***** Unit Test 13: Test Producer ************')
         myResponder = Responder('lmao')
         myUploader = DummyUploader()
-        myProducer = Producer(myResponder, myUploader, 'lmao')
+        myProducer = Producer(myResponder, myUploa der, 'lmao')
         request = '{"type":"create","requestId":"74fedd3c-40ad-4df4-a759-bab394bdb1c1","widgetId":"faa894d8-109d-472c-80ca-91b04c523bc7","owner":"Henry Hops","label":"JKBI","description":"IJFUGKKMGUSRXBEIIKPSBXHBIVFQRKEUAGHURKUZQSSEZWSJABLPPPJYTVHVUUHC","otherAttributes":[{"name":"height-unit","value":"cm"},{"name":"price","value":"47.48"},{"name":"vendor","value":"QEJHXIN"}]}'
         myProducer.process(request)
         print(TEST_WRC.toString())
